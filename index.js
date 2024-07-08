@@ -84,6 +84,7 @@ bot.on('message', async (msg) => {
                     *${item.title}*
                     Artist: ${item.artist}
                     [get_thumbnail](${item.thumbnailUrl}) | [Download_mp3](${item.downloadUrl})
+                    Developer: ${developerName}
                 `;
 
                 bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
