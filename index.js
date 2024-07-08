@@ -66,7 +66,7 @@ bot.on('message', async (msg) => {
         // If it's not a YouTube URL, assume it's a song name search
         try {
             // Fetch data from the song search API
-            const apiSearchUrl = `https://fresh-cypress-revolve.glitch.me?name=${encodeURIComponent(text)}`;
+            const apiSearchUrl = `https://lace-inky-tennis.glitch.me?name=${encodeURIComponent(text)}`;
             console.log(`Fetching data from: ${apiSearchUrl}`);
             const response = await axios.get(apiSearchUrl);
             console.log('API Response:', response.data);
