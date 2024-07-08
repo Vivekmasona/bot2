@@ -11,7 +11,7 @@ const bot = new TelegramBot(token, { polling: true });
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     const welcomeMessage = `
-    WELCOME TO VIVEKFY_AI❤️BOT!
+    WELCOME TO VIVEKFY_AI❤️BOT! vivekmasona
  Please enter a song name ya 
 enter a YouTube URL to download or play audio 
     `;
