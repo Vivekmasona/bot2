@@ -13,7 +13,7 @@ bot.onText(/\/start/, (msg) => {
     const welcomeMessage = `
     WELCOME TO VIVEKFY_AI❤️BOT!
  Please enter a song name ya 
-enter a YouTube URL to download              or play audio 
+enter a YouTube URL to download or play audio 
     `;
     bot.sendMessage(chatId, welcomeMessage);
 });
