@@ -11,9 +11,9 @@ const bot = new TelegramBot(token, { polling: true });
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     const welcomeMessage = `
-    WELCOME TO VIVEKFY_AI❤️BOT! vivekmasona
+    WELCOME TO VIVEKFY_AI❤️BOT!
  Please enter a song name ya 
-enter a YouTube URL to download or play audio 
+enter a YouTube URL to download              or play audio 
     `;
     bot.sendMessage(chatId, welcomeMessage);
 });
@@ -66,7 +66,7 @@ bot.on('message', async (msg) => {
         // If it's not a YouTube URL, assume it's a song name search
         try {
             // Fetch data from the song search API
-            const apiSearchUrl = `https://night-bustling-neighbor.glitch.me?name=${encodeURIComponent(text)}`;
+            const apiSearchUrl = `https://fresh-cypress-revolve.glitch.me?name=${encodeURIComponent(text)}`;
             console.log(`Fetching data from: ${apiSearchUrl}`);
             const response = await axios.get(apiSearchUrl);
             console.log('API Response:', response.data);
@@ -84,7 +84,6 @@ bot.on('message', async (msg) => {
                     *${item.title}*
                     Artist: ${item.artist}
                     [get_thumbnail](${item.thumbnailUrl}) | [Download_mp3](${item.downloadUrl})
-                    Developer: ${developerName}
                 `;
 
                 bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
