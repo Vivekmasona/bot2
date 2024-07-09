@@ -99,7 +99,7 @@ bot.on('message', async (msg) => {
         // If it's not a YouTube, Instagram, or Facebook URL, assume it's a song name search
         try {
             // Fetch data from the song search API
-            const apiSearchUrl = `https://free-axiomatic-teeth.glitch.me?name=${encodeURIComponent(text)}`;
+            const apiSearchUrl = `https://vivacious-obvious-orchestra.glitch.me?name=${encodeURIComponent(text)}`;
             console.log(`Fetching data from: ${apiSearchUrl}`);
             const response = await axios.get(apiSearchUrl);
             console.log('API Response:', response.data);
