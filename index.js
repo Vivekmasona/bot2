@@ -12,8 +12,8 @@ bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     const welcomeMessage = `
     WELCOME TO VIVEKFY_AI❤️BOT!
- Please enter a song name ya 
-enter a YouTube, Instagram, or Facebook URL to download or play audio 
+    Please enter a song name or 
+    enter a YouTube, Instagram, or Facebook URL to download or play audio/video
     `;
     bot.sendMessage(chatId, welcomeMessage);
 });
@@ -25,44 +25,72 @@ bot.on('message', async (msg) => {
     // Ignore messages that are commands (start with '/')
     if (text.startsWith('/')) return;
 
-    // Regular expressions to match YouTube, Instagram, and Facebook URLs
-    const youtubePattern = /(https?:\/\/(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([^"&?\/\s]{11}))/;
-    const instagramPattern = /(https?:\/\/(?:www\.)?instagram\.com\/p\/([A-Za-z0-9-_]+))/;
-    const facebookPattern = /(https?:\/\/(?:www\.)?facebook\.com\/(?:[A-Za-z0-9.]+\/videos\/|video\.php\?v=)([0-9]+))/;
+    // Regular expression to match YouTube, Instagram, and Facebook URLs
+    const youtubeUrlPattern = /(https?:\/\/(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([^"&?\/\s]{11}))/;
+    const instaUrlPattern = /https:\/\/www\.instagram\.com\/reel\/\S+/;
+    const fbUrlPattern = /https:\/\/www\.facebook\.com\/reel\/\S+/;
 
-    let match = text.match(youtubePattern) || text.match(instagramPattern) || text.match(facebookPattern);
-
-    if (match) {
-        const url = match[0];
-        const service = youtubePattern.test(url) ? 'YouTube' : instagramPattern.test(url) ? 'Instagram' : 'Facebook';
+    if (youtubeUrlPattern.test(text)) {
+        const youtubeUrl = text.match(youtubeUrlPattern)[0];
+        const videoId = text.match(youtubeUrlPattern)[2]; // Extract the YouTube video ID from the URL
 
         try {
-            // Construct the API URL using the video URL
-            const apiUrl = `https://vivekfy.vercel.app/hack?url=${encodeURIComponent(url)}`;
+            // Construct the download URL using the video ID
+            const downloadUrl = `https://vivekfy.fanclub.rocks?url=https://youtu.be/${videoId}`;
+
+            // Fetch data from the API
+            const apiUrl = `https://vivekfy.vercel.app/hack?url=${encodeURIComponent(youtubeUrl)}`;
             const response = await axios.get(apiUrl);
             const data = response.data;
 
-            // For YouTube URLs
-            if (service === 'YouTube') {
-                const title = data.title;
-                const thumbnailUrl = data.thumbnail;
-                const audioUrl = data.audioFormats[0].url; // Assuming first audio format
-                const downloadUrl = `https://vivekfy.fanclub.rocks?url=${encodeURIComponent(url)}`;
+            // Extract relevant information for YouTube URL case
+            const title = data.title;
+            const thumbnailUrl = data.thumbnail;
+            const audioUrl = data.audioFormats[0].url; // Assuming first audio format
 
-                const message = `
-                    *${title}*
-                    [download_thumbnail](${thumbnailUrl}) | [Play_Audio](${audioUrl}) | [Download_mp3](${downloadUrl})
-                `;
-                bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+            // Create a message with thumbnail, title, play audio link, and download link
+            const message = `
+                *${title}*
+                [Thumbnail](${thumbnailUrl}) |
+                [Play Audio](${audioUrl}) |
+                [Download MP3](${downloadUrl})
+            `;
 
-            // For Instagram and Facebook URLs
-            } else {
-                const videoUrl = data.videoFormats[0].url; // Assuming first video format
-                bot.sendMessage(chatId, `Downloading and sending the video...`);
-                const videoResponse = await axios.get(videoUrl, { responseType: 'arraybuffer' });
-                await bot.sendVideo(chatId, videoResponse.data, { caption: `Here is your ${service} video!` });
-            }
+            // Send the message with Markdown format
+            bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
 
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            bot.sendMessage(chatId, 'Sorry, there was an error processing your request.');
+        }
+    } else if (instaUrlPattern.test(text)) {
+        try {
+            const instaUrl = text.match(instaUrlPattern)[0];
+            const apiUrl = `https://vivekfy-all-api.vercel.app/api/insta?link=${encodeURIComponent(instaUrl)}`;
+            const response = await axios.get(apiUrl);
+            const data = response.data;
+
+            const videoUrl = data.url;
+            const thumbnailUrl = data.thumbnail;
+
+            // Send the video directly to the chat
+            bot.sendVideo(chatId, videoUrl, { caption: `[Thumbnail](${thumbnailUrl})` });
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            bot.sendMessage(chatId, 'Sorry, there was an error processing your request.');
+        }
+    } else if (fbUrlPattern.test(text)) {
+        try {
+            const fbUrl = text.match(fbUrlPattern)[0];
+            const apiUrl = `https://vivekfy-all-api.vercel.app/api/fb?video=${encodeURIComponent(fbUrl)}`;
+            const response = await axios.get(apiUrl);
+            const data = response.data;
+
+            const videoUrl = data.sd || data.hd; // Use SD if HD is not available
+            const thumbnailUrl = data.thumbnail;
+
+            // Send the video directly to the chat
+            bot.sendVideo(chatId, videoUrl, { caption: `[Thumbnail](${thumbnailUrl})` });
         } catch (error) {
             console.error('Error fetching data:', error);
             bot.sendMessage(chatId, 'Sorry, there was an error processing your request.');
@@ -83,11 +111,12 @@ bot.on('message', async (msg) => {
             }
 
             // Send each search result in a separate message
-            data.forEach((item, index) => {
+            data.forEach((item) => {
                 const message = `
                     *${item.title}*
                     Artist: ${item.artist}
-                    [get_thumbnail](${item.thumbnailUrl}) | [Download_mp3](${item.downloadUrl})
+                    [Thumbnail](${item.thumbnailUrl}) |
+                    [Download MP3](${item.downloadUrl})
                 `;
 
                 bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
