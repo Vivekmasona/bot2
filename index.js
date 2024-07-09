@@ -33,7 +33,7 @@ bot.on('message', async (msg) => {
     // Regular expression patterns for URL detection
     const youtubeUrlPattern = /(https?:\/\/(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([^"&?\/\s]{11}))/;
     const instaUrlPattern = /https:\/\/www\.instagram\.com\/reel\/\S+/;
-    const fbUrlPattern = /https:\/\/www\.facebook\.com\/reel\/\S+/;
+    const fbUrlPattern = /https:\/\/www\.facebook\.com\/(?:reel|share\/v|share|watch|story)\/\S+/;
 
     if (youtubeUrlPattern.test(text)) {
         // Handle YouTube URL
@@ -80,15 +80,25 @@ bot.on('message', async (msg) => {
         // Handle Instagram URL
         try {
             const instaUrl = text.match(instaUrlPattern)[0];
+            const apiUrl = `https://vivekfy-all-api.vercel.app/api/insta?link=${encodeURIComponent(instaUrl)}`;
+            const response = await axios.get(apiUrl);
+            const data = response.data.data[0];
 
-            // Construct the download URL using the provided format
-            const downloadUrl = `https://vivekfy.fanclub.rocks?url=${instaUrl}`;
+            const thumbnailUrl = data.thumbnail;
+            const videoUrl = data.url;
 
-            // Send the download URL with a button
-            bot.sendMessage(chatId, `Download from Instagram:`, {
+            // Create a message with thumbnail and download button
+            const message = `
+                [Thumbnail](${thumbnailUrl})
+                
+                *Download the Instagram video below:*
+            `;
+
+            bot.sendMessage(chatId, message, {
+                parse_mode: 'Markdown',
                 reply_markup: {
                     inline_keyboard: [
-                        [{ text: 'Download', url: downloadUrl }]
+                        [{ text: 'Download', url: videoUrl }]
                     ]
                 }
             });
