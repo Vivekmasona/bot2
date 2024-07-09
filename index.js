@@ -12,11 +12,13 @@ bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     const username = msg.from.username;
     const welcomeMessage = `
-    Hello ${username} babu,
-    Welcome to VIVEKFY AI BOT!
-    Please enter a song name or 
-    enter a YouTube, Instagram, or Facebook URL to download or play audio/video
-    `;
+Hello👋 ${username} 🥰babu! 
+
+Welcome🙏to VIVEKFY AI BOT!🤖
+
+Please enter a song name or 
+enter a YouTube, Instagram, or Facebook URL to download or play audio/video
+`;
     bot.sendMessage(chatId, welcomeMessage);
 });
 
@@ -56,7 +58,17 @@ bot.on('message', async (msg) => {
             `;
 
             // Send the message with Markdown format
-            bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+            bot.sendMessage(chatId, message, {
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: 'Play Audio 🎵', url: audioUrl },
+                            { text: 'Download MP3 📥', url: `https://vivekfy.fanclub.rocks?url=https://youtu.be/${videoId}` }
+                        ]
+                    ]
+                }
+            });
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -95,7 +107,14 @@ bot.on('message', async (msg) => {
             const thumbnailUrl = data.thumbnail;
 
             // Send the video directly to the chat
-            bot.sendVideo(chatId, videoUrl, { caption: `[Thumbnail](${thumbnailUrl})` });
+            bot.sendVideo(chatId, videoUrl, {
+                caption: `[Thumbnail](${thumbnailUrl})`,
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: 'Watch Video ▶️', url: videoUrl }]
+                    ]
+                }
+            });
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -123,7 +142,17 @@ bot.on('message', async (msg) => {
                     [Download MP3](${item.downloadUrl})
                 `;
 
-                bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+                bot.sendMessage(chatId, message, {
+                    parse_mode: 'Markdown',
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: 'Play Audio 🎵', url: item.audioUrl },
+                                { text: 'Download MP3 📥', url: item.downloadUrl }
+                            ]
+                        ]
+                    }
+                });
             });
 
         } catch (error) {
