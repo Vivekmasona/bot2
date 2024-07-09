@@ -10,18 +10,19 @@ const bot = new TelegramBot(token, { polling: true });
 // Welcome message for new users
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
-    const username = msg.from.username;
+    const firstName = msg.from.first_name;
     const welcomeMessage = `
-Hello👋 ${username} 🥰babu! 
+    Hello👋 ${firstName} 🥰babu
 
-Welcome🙏to VIVEKFY AI BOT!🤖
-
-Please enter a song name or 
-enter a YouTube, Instagram, or Facebook URL to download or play audio/video
-`;
-    bot.sendMessage(chatId, welcomeMessage);
+    WELCOME🙏TO VIVEKFY🎧AI BOT!🤖
+    
+    Please enter a 🎧song name or 
+    enter a YouTube, Instagram, or Facebook 🔗URL to download or play audio/video
+    `;
+    bot.sendMessage(chatId, welcomeMessage, { parse_mode: 'Markdown' });
 });
 
+// Handle regular messages (not commands)
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text;
@@ -29,7 +30,7 @@ bot.on('message', async (msg) => {
     // Ignore messages that are commands (start with '/')
     if (text.startsWith('/')) return;
 
-    // Regular expression to match YouTube, Instagram, and Facebook URLs
+    // Regular expression patterns for URL detection
     const youtubeUrlPattern = /(https?:\/\/(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([^"&?\/\s]{11}))/;
     const instaUrlPattern = /https:\/\/www\.instagram\.com\/reel\/\S+/;
     const fbUrlPattern = /https:\/\/www\.facebook\.com\/reel\/\S+/;
@@ -49,23 +50,24 @@ bot.on('message', async (msg) => {
             const title = data.title;
             const thumbnailUrl = data.thumbnail;
             const audioUrl = data.audioFormats[0].url; // Assuming first audio format
+            const downloadUrl = `https://vivekfy.fanclub.rocks?url=${youtubeUrl}`;
 
             // Create a message with thumbnail, title, play audio link, and download link
             const message = `
+                [Thumbnail](${thumbnailUrl})
+                
                 *${title}*
-                [Thumbnail](${thumbnailUrl}) |
-                [Play Audio](${audioUrl})
+                
             `;
 
-            // Send the message with Markdown format
+            // Send the message with buttons
             bot.sendMessage(chatId, message, {
                 parse_mode: 'Markdown',
                 reply_markup: {
                     inline_keyboard: [
-                        [
-                            { text: 'Play Audio 🎵', url: audioUrl },
-                            { text: 'Download MP3 📥', url: `https://vivekfy.fanclub.rocks?url=https://youtu.be/${videoId}` }
-                        ]
+                        [{ text: 'Play Audio', url: audioUrl }],
+                        [{ text: 'Download', url: downloadUrl }],
+                        [{ text: 'Thumbnail', url: thumbnailUrl }]
                     ]
                 }
             });
@@ -78,12 +80,12 @@ bot.on('message', async (msg) => {
         // Handle Instagram URL
         try {
             const instaUrl = text.match(instaUrlPattern)[0];
-            
+
             // Construct the download URL using the provided format
             const downloadUrl = `https://vivekfy.fanclub.rocks?url=${instaUrl}`;
 
             // Send the download URL with a button
-            bot.sendMessage(chatId, `Download from Instagram: ${downloadUrl}`, {
+            bot.sendMessage(chatId, `Download from Instagram:`, {
                 reply_markup: {
                     inline_keyboard: [
                         [{ text: 'Download', url: downloadUrl }]
@@ -107,14 +109,7 @@ bot.on('message', async (msg) => {
             const thumbnailUrl = data.thumbnail;
 
             // Send the video directly to the chat
-            bot.sendVideo(chatId, videoUrl, {
-                caption: `[Thumbnail](${thumbnailUrl})`,
-                reply_markup: {
-                    inline_keyboard: [
-                        [{ text: 'Watch Video ▶️', url: videoUrl }]
-                    ]
-                }
-            });
+            bot.sendVideo(chatId, videoUrl, { caption: `[Thumbnail](${thumbnailUrl})` });
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -124,7 +119,7 @@ bot.on('message', async (msg) => {
         // Assume it's a song name search
         try {
             // Fetch data from the song search API
-            const apiSearchUrl = `https://furry-fantasy-daughter.glitch.me?name=${encodeURIComponent(text)}`;
+            const apiSearchUrl = `https://recondite-paint-warlock.glitch.me?name=${encodeURIComponent(text)}`;
             const response = await axios.get(apiSearchUrl);
             const data = response.data;
 
@@ -136,20 +131,19 @@ bot.on('message', async (msg) => {
             // Send each search result in a separate message
             data.forEach((item) => {
                 const message = `
+                    [Thumbnail](${item.thumbnailUrl})
+                    
                     *${item.title}*
                     Artist: ${item.artist}
-                    [Thumbnail](${item.thumbnailUrl}) |
-                    [Download MP3](${item.downloadUrl})
                 `;
 
                 bot.sendMessage(chatId, message, {
                     parse_mode: 'Markdown',
                     reply_markup: {
                         inline_keyboard: [
-                            [
-                                { text: 'Play Audio 🎵', url: item.audioUrl },
-                                { text: 'Download MP3 📥', url: item.downloadUrl }
-                            ]
+                            [{ text: 'Play Audio', url: item.downloadUrl }],
+                            [{ text: 'Download', url: item.downloadUrl }],
+                            [{ text: 'Thumbnail', url: item.thumbnailUrl }]
                         ]
                     }
                 });
