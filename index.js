@@ -10,8 +10,10 @@ const bot = new TelegramBot(token, { polling: true });
 // Welcome message for new users
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
+    const username = msg.from.username;
     const welcomeMessage = `
-    WELCOME TO YOUR_BOT_NAME_HERE BOT!
+    Hello ${username} babu,
+    Welcome to VIVEKFY AI BOT!
     Please enter a song name or 
     enter a YouTube, Instagram, or Facebook URL to download or play audio/video
     `;
