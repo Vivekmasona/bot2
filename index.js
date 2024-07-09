@@ -124,7 +124,7 @@ bot.on('message', async (msg) => {
         // Assume it's a song name search
         try {
             // Fetch data from the song search API
-            const apiSearchUrl = `https://vivacious-obvious-orchestra.glitch.me?name=${encodeURIComponent(text)}`;
+            const apiSearchUrl = `https://furry-fantasy-daughter.glitch.me?name=${encodeURIComponent(text)}`;
             const response = await axios.get(apiSearchUrl);
             const data = response.data;
 
